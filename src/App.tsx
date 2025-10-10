@@ -4,12 +4,9 @@ import Ativos from "@/pages/ativos"
 import Sobre from "@/pages/sobre"
 import {
   Menubar,
-  MenubarCheckboxItem,
   MenubarContent,
   MenubarItem,
   MenubarMenu,
-  MenubarRadioGroup,
-  MenubarRadioItem,
   MenubarSeparator,
   MenubarShortcut,
   MenubarSub,
@@ -17,16 +14,20 @@ import {
   MenubarSubTrigger,
   MenubarTrigger,
 } from "@/components/ui/menubar"
+import Localidades from "./pages/localidades"
 import Grupos from "./pages/grupos"
 import SubGrupos from "./pages/subgrupos"
 import Marcas from "./pages/marcas"
 import Usuarios from "./pages/usuarios"
 import CentroCusto from "./pages/centrocusto"
+import Header from "./components/header"
 
 export default function App() {
   return (
     <BrowserRouter>
       <div className="flex flex-col h-screen">
+        <Header />
+
         <div className="w-full mb-1">
           <Menubar>
             <MenubarMenu>
@@ -40,6 +41,11 @@ export default function App() {
             <MenubarMenu>
               <MenubarTrigger>Cadastros</MenubarTrigger>
               <MenubarContent>
+                <MenubarItem asChild>
+                  <Link to="/localidades">
+                    Localidades <MenubarShortcut>⌘L</MenubarShortcut>
+                  </Link>
+                </MenubarItem>
                 <MenubarItem asChild>
                   <Link to="/grupos">
                     Grupos <MenubarShortcut>⌘G</MenubarShortcut>
@@ -104,6 +110,7 @@ export default function App() {
         <div className="flex-1 overflow-auto w-full p-4">
           <Routes>
             <Route path="/home" element={<Home />} />
+            <Route path="/localidades" element={<Localidades />} />
             <Route path="/grupos" element={<Grupos />} />
             <Route path="/subgrupos" element={<SubGrupos />} />
             <Route path="/centrocusto" element={<CentroCusto />} />
