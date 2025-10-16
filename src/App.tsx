@@ -72,7 +72,7 @@ export default function App() {
                   </Link>
                 </MenubarItem>
                 <MenubarItem asChild>
-                  <Link to='/centrocusto'>
+                  <Link to='/usuarios'>
                     Usuários <MenubarShortcut>⌘U</MenubarShortcut>
                   </Link>
                 </MenubarItem>

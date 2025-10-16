@@ -12,49 +12,49 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { api } from '@/lib/axios';
-import { ILocalidade } from '@/lib/interface';
+import { IGrupo } from '@/lib/interface';
 import { AxiosRequestConfig } from 'axios';
 
-const esquemaLocalidade = z.object({
+const esquemaGrupo = z.object({
   descricao: z.string().min(3, 'É necessário informar no mínimo 3 caracteres'),
 })
-type TLocalidade = z.infer<typeof esquemaLocalidade>
+type TGrupo = z.infer<typeof esquemaGrupo>
 type Props = {  
   isModalOpen: (isOpen:boolean) => void 
   isEditting: boolean
-  localidade: ILocalidade | undefined
+  grupo: IGrupo | undefined
 }
 
-export default function FrmLocalidade({ isModalOpen, isEditting, localidade }: Props) {
+export default function FrmGrupo({ isModalOpen, isEditting, grupo }: Props) {
   const tituloPagina = isEditting ? 'Alteração no ' : 'Inclusão no '
-  const form = useForm<TLocalidade>({
-    resolver: zodResolver(esquemaLocalidade),
+  const form = useForm<TGrupo>({
+    resolver: zodResolver(esquemaGrupo),
     defaultValues: {
-      descricao: isEditting ? localidade?.descricao : ''
+      descricao: isEditting ? grupo?.descricao : ''
     }
   })
 
-  async function onSubmit(values: TLocalidade) {
+  async function onSubmit(values: TGrupo) {
     const config: AxiosRequestConfig = {
       headers: {
         'Content-Type': 'application/json',
       },
     }
     if (isEditting) {
-      await api.put(`localidades/${localidade?.id}`, values, config)
-      alert(`Localidade alterada com sucesso!`)
+      await api.put(`grupos/${grupo?.id}`, values, config)
+      alert(`Grupo alterado com sucesso!`)
       isModalOpen(false)
       
     } else {
-      await api.post('localidades', values, config)
-      alert(`Nova Localidade incluída com sucesso!`)
+      await api.post('grupos', values, config)
+      alert(`Novo Grupo incluído com sucesso!`)
       isModalOpen(false)
     }
   }
   
   return (
     <div className='flex flex-col h-full items-start'>
-      <h1 className='flex w-full h-10 font-bold text-lg justify-center items-center mb-4 bg-gray-200'>{tituloPagina} Cadastro de Localidades</h1>
+      <h1 className='flex w-full h-10 font-bold text-lg justify-center items-center mb-4 bg-gray-200'>{tituloPagina} Cadastro de Grupos</h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col justify-between w-full h-full space-y-8 flex-1">
           <FormField

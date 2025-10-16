@@ -18,7 +18,21 @@ import FrmLocalidade from "@/components/forms/frmlocalidade"
 
 export default function Localidades() {
   const [localidades, setLocalidades] = useState<ILocalidade[]>([])
-  const [isOpenAddNew, setIsOpenAddNew] = useState(false)
+  const [localidade, setLocalidade] = useState<ILocalidade>()
+  const [isOpenModal, setIsOpenModal] = useState(false)
+  const [isEditting, setIsEditting] = useState(false)
+
+  function handleOpenModal(tipo: string, objLocalidade: ILocalidade) {
+    if (tipo==='add') {
+      setIsOpenModal(true)
+      setIsEditting(false)
+    } 
+    if (tipo==='edit') {
+      setIsOpenModal(true)
+      setIsEditting(true)
+      setLocalidade(objLocalidade)
+    } 
+  }
 
   async function listaLocalidades() {
     const response = await api.get('localidades')
@@ -29,25 +43,13 @@ export default function Localidades() {
     const config: AxiosRequestConfig = {
       data: localidade,
     };
-    if (window.confirm("Tem certeza que deseja excluír este registro?")) {
-       await api.delete('localidades', config)
+    if (window.confirm(`Tem certeza que deseja excluír localidade ${localidade.descricao}?`)) {
+       await api.delete(`localidades/${localidade.id}`, config)
        alert(`Registro de ${localidade.descricao} excluido com sucesso!`)
        listaLocalidades()
     }
   }
-
-  async function incluiLocalidade() {
-    const novaLocalidade: ILocalidade = { id: 456, descricao: 'New Location' };
-    const config: AxiosRequestConfig = {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
-    await api.post('localidades', novaLocalidade, config)
-    alert(`Nova Localidade incluída com sucesso!`)
-    listaLocalidades()
-  }
-
+  
   useEffect(() => {
     listaLocalidades()
   }, [])
@@ -56,23 +58,25 @@ export default function Localidades() {
     <div>
       <div className="flex flex-row justify-between mb-2">
         <h1 className="text-2xl font-bold">Localidades</h1>
-        <Button variant="outline" onClick={() => setIsOpenAddNew(true)}>+ Novo</Button>
+        <Button variant="outline" onClick={ () => handleOpenModal('add', {} as ILocalidade) }>+ Novo</Button>
       </div>
       <div>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[100px]">Id</TableHead>
-              <TableHead className="flex-1">Descrição</TableHead>
-              <TableHead className="text-center w-32" colSpan={2}>Opções</TableHead>
+              <TableHead className="flex-1 bg-gray-100 border-b-2 border-gray-300">Descrição</TableHead>
+              <TableHead className="text-center w-32 bg-gray-100 border-b-2 border-gray-300" colSpan={2}>Opções</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {localidades.map((item) => (
               <TableRow key={item.id}>
-                <TableCell className="font-medium">{item.id}</TableCell>
                 <TableCell className="flex-1">{item.descricao}</TableCell>
-                <TableCell className="w-14">Alterar</TableCell>
+                <TableCell className="w-14">
+                  <Link to='#' onClick={() => handleOpenModal('edit', item)}>
+                    Alterar
+                  </Link>
+                </TableCell>
                 <TableCell className="w-14"><Link to='#' onClick={()=>excluiLocalidade(item)}>Excluir</Link></TableCell>
               </TableRow>
             ))}
@@ -80,34 +84,32 @@ export default function Localidades() {
         </Table>
 
         <ReactModal 
-          isOpen={isOpenAddNew}
+          isOpen={isOpenModal}
           onAfterClose={listaLocalidades}
           style={{
             overlay: {
               position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
               backgroundColor: 'rgba(255, 255, 255, 0.75)'
             },
             content: {
               position: 'absolute',
-              top: '40px',
-              left: '40px',
-              right: '40px',
-              bottom: '40px',
+              top: '30%',
+              left: '40%',
+              right: '40%',
+              bottom: '40%',
               border: '1px solid #ccc',
               background: '#fff',
               overflow: 'auto',
+              width: 500,
+              height: 300,
               WebkitOverflowScrolling: 'touch',
               borderRadius: '4px',
               outline: 'none',
-              padding: '20px'
+              padding: '8px'
             }  
           }}
         >
-          <FrmLocalidade isModalOpen={setIsOpenAddNew} />
+          <FrmLocalidade isModalOpen={setIsOpenModal} isEditting={isEditting} localidade={localidade} />
         </ReactModal>
       </div>
     </div>

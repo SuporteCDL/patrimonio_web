@@ -12,49 +12,49 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { api } from '@/lib/axios';
-import { ILocalidade } from '@/lib/interface';
+import { ICentroCusto } from '@/lib/interface';
 import { AxiosRequestConfig } from 'axios';
 
-const esquemaLocalidade = z.object({
+const esquemaCentroCusto = z.object({
   descricao: z.string().min(3, 'É necessário informar no mínimo 3 caracteres'),
 })
-type TLocalidade = z.infer<typeof esquemaLocalidade>
+type TCentroCusto = z.infer<typeof esquemaCentroCusto>
 type Props = {  
   isModalOpen: (isOpen:boolean) => void 
   isEditting: boolean
-  localidade: ILocalidade | undefined
+  centroCusto: ICentroCusto | undefined
 }
 
-export default function FrmLocalidade({ isModalOpen, isEditting, localidade }: Props) {
+export default function FrmCentroCusto({ isModalOpen, isEditting, centroCusto }: Props) {
   const tituloPagina = isEditting ? 'Alteração no ' : 'Inclusão no '
-  const form = useForm<TLocalidade>({
-    resolver: zodResolver(esquemaLocalidade),
+  const form = useForm<TCentroCusto>({
+    resolver: zodResolver(esquemaCentroCusto),
     defaultValues: {
-      descricao: isEditting ? localidade?.descricao : ''
+      descricao: isEditting ? centroCusto?.descricao : ''
     }
   })
 
-  async function onSubmit(values: TLocalidade) {
+  async function onSubmit(values: TCentroCusto) {
     const config: AxiosRequestConfig = {
       headers: {
         'Content-Type': 'application/json',
       },
     }
     if (isEditting) {
-      await api.put(`localidades/${localidade?.id}`, values, config)
-      alert(`Localidade alterada com sucesso!`)
+      await api.put(`centrocusto/${centroCusto?.id}`, values, config)
+      alert(`Centro de Custo alterado com sucesso!`)
       isModalOpen(false)
       
     } else {
-      await api.post('localidades', values, config)
-      alert(`Nova Localidade incluída com sucesso!`)
+      await api.post('centrocusto', values, config)
+      alert(`Novo Centro de Custo incluído com sucesso!`)
       isModalOpen(false)
     }
   }
   
   return (
     <div className='flex flex-col h-full items-start'>
-      <h1 className='flex w-full h-10 font-bold text-lg justify-center items-center mb-4 bg-gray-200'>{tituloPagina} Cadastro de Localidades</h1>
+      <h1 className='flex w-full h-10 font-bold text-lg justify-center items-center mb-4 bg-gray-200'>{tituloPagina} Cadastro de Centro de Custos</h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col justify-between w-full h-full space-y-8 flex-1">
           <FormField

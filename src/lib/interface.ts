@@ -36,6 +36,8 @@ export interface IAtivo {
   codsubgrupo: number;
   codcentrocusto: number;
   codmarca: number;
+  encontrado: boolean;
+  codlocalidade: number;
 }
 
 export interface IUsuario {
