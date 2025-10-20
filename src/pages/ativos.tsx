@@ -2,6 +2,10 @@ import { api } from "@/lib/axios"
 import ReactModal from 'react-modal'
 import { IAtivo, IAtivoJoin, ICentroCusto, ILocalidade, IMarca } from "@/lib/interface"
 import { useEffect, useState } from "react"
+import * as XLSX from "xlsx"
+import { saveAs } from "file-saver"
+import jsPDF from "jspdf"
+import "jspdf-autotable"
 import { Button } from "@/components/ui/button"
 import {
   Table,
@@ -75,6 +79,40 @@ export default function Ativos() {
     setMarcas(marcas.data)
   }
   
+  function exportarExcel() {
+  const ws = XLSX.utils.json_to_sheet(ativos)
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, "Ativos")
+
+  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" })
+  const blob = new Blob([excelBuffer], { type: "application/octet-stream" })
+  saveAs(blob, "ativos.xlsx")
+}
+
+function exportarPDF() {
+  const doc = new jsPDF()
+  doc.text("CONTROLE PATRIMONIAL CDL - Relatório de Ativos", 14, 10)
+
+  // Cabeçalhos
+  const colunas = ["Código", "Sub-grupo", "Descrição", "Localidade", "Centro Custo", "Marca"]
+  const linhas = ativos.map(a => [
+    a.codigo,
+    a.subgrupo,
+    a.descricao,
+    a.localidade,
+    a.centrocusto,
+    a.marca,
+  ])
+
+  doc.autoTable({
+    head: [colunas],
+    body: linhas,
+    startY: 20,
+  })
+
+  doc.save("ativos.pdf")
+}
+
   useEffect(() => {
     listaAtivos()
     carregarDados()
@@ -165,6 +203,8 @@ export default function Ativos() {
           />
           <Button className="md:w-20 w-full" onClick={buscarAtivos}>Buscar</Button>
           <Button className="w-full md:w-20" variant="outline" onClick={ () => handleOpenModal('add', {} as IAtivo) }>+ Novo</Button>
+          <Button className="md:w-20 w-full bg-green-600 hover:bg-green-700" onClick={exportarExcel}>XLS</Button>
+          <Button className="md:w-20 w-full bg-red-500 hover:bg-red-700" onClick={exportarPDF}>PDF</Button>
         </div>
       </div>
       <div>
