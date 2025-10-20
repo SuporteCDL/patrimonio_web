@@ -1,6 +1,13 @@
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { ChevronDownIcon } from "lucide-react"
+import { Calendar } from "@/components/ui/calendar"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import { Button } from "../ui/button";
 import {
   Form,
@@ -19,13 +26,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Label } from '../ui/label';
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { api } from '@/lib/axios';
 import { IAtivo, ICentroCusto, ILocalidade, IMarca } from '@/lib/interface';
 import { AxiosRequestConfig } from 'axios';
-import { Label } from '../ui/label';
 import { useEffect, useState } from 'react';
+import { formatDateForDB } from '@/utils/functions';
 
 interface ISubGrupo {
   id: number;
@@ -34,47 +42,66 @@ interface ISubGrupo {
 }
 
 const esquemaAtivo = z.object({
+  codlocalidade: z.string()
+  .refine((val) => val !== '0', {
+    message: 'Selecione uma localidade válida'
+  }),
   codigo: z.string().min(1, 'Favor informar no mínimo 1 caracter'),
-  status: z.string().min(3, 'Informe pelo menos 3 caracteres do Status'),
+  status: z.string().min(3, 'Favor informar o Status'),
   descricao: z.string().min(3, 'O nome deve ter no mínimo 3 caracteres'),
-  aquisicao: z.string(),
+  aquisicao: z.string().optional(),
   valor_aquisicao: z.string(),
   valor_atual: z.string(),
   depreciacao: z.string(),
-  codsubgrupo: z.string(),
-  codcentrocusto: z.string(),
-  codmarca: z.string(),
+  codsubgrupo: z.string()
+  .refine((val) => val !== "0",
+   { 
+    message: 'Favor informar o Sub-Grupo' 
+   }),
+  codcentrocusto: z.string()
+  .refine((val) => val !== "0", { 
+    message: 'Favor informar o Centro de Custo' 
+  }),
+  codmarca: z.string()
+  .refine((val) => val !== '0', { 
+    message: 'Favor informar a Marca' 
+  }),
   encontrado: z.boolean(),
-  codlocalidade: z.string(),
+  motivo_baixa: z.string().optional()
 })
 type TAtivo = z.infer<typeof esquemaAtivo>
 type Props = {  
   isModalOpen: (isOpen:boolean) => void 
   isEditting: boolean
   ativo: IAtivo | undefined
+  listAtivos: (codlocal: number) => void
 }
 
-export default function FrmAtivo({ isModalOpen, isEditting, ativo }: Props) {
-  const [statusEncontrado, setStatusEncontrado] = useState('Não')
+export default function FrmAtivo({ isModalOpen, isEditting, ativo, listAtivos }: Props) {
+  const [statusEncontrado, setStatusEncontrado] = useState("Não")
   const [localidades, setLocalidades] = useState<ILocalidade[]>([])
   const [subGrupos, setSubGrupos] = useState<ISubGrupo[]>([])
   const [centroCusto, setCentroCusto] = useState<ICentroCusto[]>([])
   const [marcas, setMarcas] = useState<IMarca[]>([])
+  const [open, setOpen] = useState(false)
+  const [dataAquisicao, setDataAquisicao] = useState<Date | undefined>(
+    ativo?.aquisicao ? new Date(ativo.aquisicao.replace(" ", "T")) : undefined
+  )
   const tituloPagina = isEditting ? 'Alteração no ' : 'Inclusão no '
   const form = useForm<TAtivo>({
     resolver: zodResolver(esquemaAtivo),
     defaultValues: {
-      codigo: isEditting ? ativo?.codigo : '', 
-      status: isEditting ? ativo?.status : '', 
-      descricao: isEditting ? ativo?.descricao : '', 
-      aquisicao: isEditting ? ativo?.aquisicao : '', 
-      valor_aquisicao: isEditting ? ativo?.valor_aquisicao : '', 
-      valor_atual: isEditting ? ativo?.valor_atual : '', 
-      depreciacao: isEditting ? ativo?.depreciacao : '',
-      codsubgrupo: isEditting ? String(ativo?.codsubgrupo) : '0',
-      codcentrocusto: isEditting ? String(ativo?.codcentrocusto) : '0',
-      codmarca: isEditting ? String(ativo?.codmarca) : '0',
-      codlocalidade: isEditting ? String(ativo?.codlocalidade) : '0',
+      codlocalidade: isEditting ? String(ativo?.codlocalidade) : "0",
+      codigo: isEditting ? ativo?.codigo : "", 
+      status: isEditting ? ativo?.status : "", 
+      motivo_baixa: isEditting ? ativo?.motivo_baixa : "",
+      descricao: isEditting ? ativo?.descricao : "", 
+      valor_aquisicao: isEditting ? String(ativo?.valor_aquisicao) : "0", 
+      valor_atual: isEditting ? String(ativo?.valor_atual) : "0", 
+      depreciacao: isEditting ? String(ativo?.depreciacao) : "0",
+      codsubgrupo: isEditting ? String(ativo?.codsubgrupo) : "0",
+      codcentrocusto: isEditting ? String(ativo?.codcentrocusto) : "0",
+      codmarca: isEditting ? String(ativo?.codmarca) : "0",
       encontrado: isEditting ? ativo?.encontrado : false,
     }
   })
@@ -108,21 +135,38 @@ export default function FrmAtivo({ isModalOpen, isEditting, ativo }: Props) {
   }
 
   async function onSubmit(values: TAtivo) {
+    const dataFormatada = formatDateForDB(new Date(String(dataAquisicao)))
+    const dados = {
+      codigo: values.codigo,
+      status: values.status,
+      motivo_baixa: values.motivo_baixa,
+      descricao: values.descricao,
+      aquisicao: dataFormatada,
+      valor_aquisicao: Number(values.valor_aquisicao),
+      valor_atual: Number(values.valor_atual),
+      depreciacao: Number(values.depreciacao),
+      codsubgrupo: Number(values.codsubgrupo),
+      codcentrocusto: Number(values.codcentrocusto),
+      codmarca: Number(values.codmarca),
+      codlocalidade: Number(values.codlocalidade),
+      encontrado: values.encontrado
+    }
     const config: AxiosRequestConfig = {
       headers: {
         'Content-Type': 'application/json',
       },
     }
-    // if (isEditting) {
-    //   await api.put(`ativos/${ativo?.id}`, values, config)
-    //   alert(`Ativo alterado com sucesso!`)
-    //   isModalOpen(false)
-      
-    // } else {
-    //   await api.post('ativos', values, config)
-    //   alert(`Novo Ativo incluído com sucesso!`)
-    //   isModalOpen(false)
-    // }
+    if (isEditting) {
+      await api.put(`ativos/${ativo?.id}`, dados, config)
+      alert(`Ativo alterado com sucesso!`)
+      isModalOpen(false)
+      listAtivos(Number(ativo?.codlocalidade))
+    } else {
+      await api.post('ativos', dados, config)
+      alert(`Novo Ativo incluído com sucesso!`)
+      isModalOpen(false)
+      listAtivos(Number(ativo?.codlocalidade))
+    }
   }
   
   useEffect(() => {
@@ -133,10 +177,10 @@ export default function FrmAtivo({ isModalOpen, isEditting, ativo }: Props) {
   }, [])
 
   return (
-    <div className='flex flex-col h-full items-start'>
+    <div className='flex flex-col w-full h-full items-start'>
       <h1 className='flex w-full h-10 font-bold text-lg justify-center items-center mb-4 bg-gray-200'>{tituloPagina} Cadastro de Ativos</h1>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col justify-between w-full h-full flex-1">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col justify-between w-full h-full">
           
           <div className='flex md:flex-row flex-col gap-4 w-full'>
             <FormField
@@ -151,7 +195,7 @@ export default function FrmAtivo({ isModalOpen, isEditting, ativo }: Props) {
                       value={String(field.value)}
                       defaultValue={String(field.value)}
                     >
-                      <SelectTrigger className="w-96">
+                      <SelectTrigger className="md:w-96 w-full">
                         <SelectValue placeholder="Selecione a localidade" />
                       </SelectTrigger>
                       <SelectContent>
@@ -175,7 +219,7 @@ export default function FrmAtivo({ isModalOpen, isEditting, ativo }: Props) {
                 <FormItem>
                   <FormLabel>Codigo:</FormLabel>
                   <FormControl>
-                    <Input placeholder="999999" className='w-96' {...field} />
+                    <Input placeholder="999999" className='md:w-96 w-full' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -191,7 +235,7 @@ export default function FrmAtivo({ isModalOpen, isEditting, ativo }: Props) {
                 <FormItem>
                   <FormLabel>Descricao:</FormLabel>
                   <FormControl>
-                    <Input placeholder="Descrição" className='w-96' {...field} />
+                    <Input placeholder="Descrição" className='md:w-96 w-full' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -205,12 +249,68 @@ export default function FrmAtivo({ isModalOpen, isEditting, ativo }: Props) {
                 <FormItem>
                   <FormLabel>Status:</FormLabel>
                   <FormControl>
-                    <Input placeholder="Status" className='w-96' {...field} />
+                    <Select
+                      onValueChange={field.onChange}
+                      value={String(field.value)}
+                      defaultValue={String(field.value)}
+                    >
+                      <SelectTrigger className="md:w-96 w-full">
+                        <SelectValue placeholder="Selecione o status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Incluido">Incluido</SelectItem>
+                        <SelectItem value="Alterado">Alterado</SelectItem>
+                        <SelectItem value="Baixado">Baixado</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+          </div>
+
+          <div className='flex md:flex-row flex-col gap-4 w-full'>
+            <FormField
+              control={form.control}
+              name="motivo_baixa"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Motivo da baixa:</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Motivo da baixa" className='md:w-96 w-full' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className='flex flex-col gap-2 p-1'>
+              <label htmlFor="date" className='text-sm font-semibold'>Aquisição:</label>
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    id="date"
+                    className="w-96 justify-between font-normal text-gray-500"
+                  >
+                    {dataAquisicao ? dataAquisicao.toLocaleDateString() : "Informe a data"}
+                    <ChevronDownIcon />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={dataAquisicao}
+                    captionLayout="dropdown"
+                    onSelect={(dataAquisicao) => {
+                      setDataAquisicao(dataAquisicao)
+                      setOpen(false)
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
           </div>
 
           <div className='flex md:flex-row flex-col gap-4 w-full'>
@@ -226,7 +326,7 @@ export default function FrmAtivo({ isModalOpen, isEditting, ativo }: Props) {
                       value={String(field.value)}
                       defaultValue={String(field.value)}
                     >
-                      <SelectTrigger className="w-96">
+                      <SelectTrigger className="md:w-96 w-full">
                         <SelectValue placeholder="Selecione o Subgrupo" />
                       </SelectTrigger>
                       <SelectContent>
@@ -255,7 +355,7 @@ export default function FrmAtivo({ isModalOpen, isEditting, ativo }: Props) {
                       value={String(field.value)}
                       defaultValue={String(field.value)}
                     >
-                      <SelectTrigger className="w-96">
+                      <SelectTrigger className="md:w-96 w-full">
                         <SelectValue placeholder="Selecione o Centro de Custo" />
                       </SelectTrigger>
                       <SelectContent>
@@ -286,7 +386,7 @@ export default function FrmAtivo({ isModalOpen, isEditting, ativo }: Props) {
                       value={String(field.value)}
                       defaultValue={String(field.value)}
                     >
-                      <SelectTrigger className="w-96">
+                      <SelectTrigger className="md:w-96 w-full">
                         <SelectValue placeholder="Selecione a Marca" />
                       </SelectTrigger>
                       <SelectContent>

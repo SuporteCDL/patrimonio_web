@@ -1,6 +1,6 @@
 import { api } from "@/lib/axios"
 import ReactModal from 'react-modal'
-import { IAtivo, ICentroCusto, ILocalidade, IMarca, ISubGrupo } from "@/lib/interface"
+import { IAtivo, IAtivoJoin, ICentroCusto, ILocalidade, IMarca } from "@/lib/interface"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
@@ -17,30 +17,12 @@ import { AxiosRequestConfig } from "axios"
 import FrmAtivo from "@/components/forms/frmativo"
 import { Input } from "@/components/ui/input"
 
-interface IAtivoJoin {
-  id: number
-  codigo: string
-  status: string
-  descricao: string
-  aquisicao: string
-  valor_aquisicao: string
-  valor_atual: string
-  depreciacao: string
-  codsubgrupo: number
-  codcentrocusto: number
-  codmarca: number
-  codlocalidade: number
-  encontrado: boolean
-  localidade: string
-  subgrupo: string
-  centrocusto: string
-  marca: string
-}
 export default function Ativos() {
   const [localidades, setLocalidades] = useState<ILocalidade[]>([])
   const [centroCusto, setCentroCusto] = useState<ICentroCusto[]>([])
   const [subgrupos, setSubgrupos] = useState<any[]>([])
   const [marcas, setMarcas] = useState<IMarca[]>([])
+  const [codLocal, setCodLocal] = useState(0)
   const [filtros, setFiltros] = useState({
     codlocalidade: "",
     codcentrocusto: "",
@@ -62,22 +44,21 @@ export default function Ativos() {
       setIsOpenModal(true)
       setIsEditting(true)
       setAtivo(objAtivo)
+      setCodLocal(objAtivo.codlocalidade)
     }
   }
 
-  async function listaAtivos() {
-    const response = await api.get('ativos')
+  async function listaAtivos(codlocalidade?: number) {
+    const response = await api.get(`ativos?codlocalidade=${codlocalidade}`)
     setAtivos(response.data)
   }
 
   async function excluIAtivo(ativo: IAtivo) {
-    const config: AxiosRequestConfig = {
-      data: ativo,
-    };
+    // alert(`ativos/${ativo.id}`)
     if (window.confirm(`Tem certeza que deseja excluír ativo ${ativo.descricao}?`)) {
-       await api.delete(`ativos/${ativo.id}`, config)
-       alert(`Registro de ${ativo.descricao} excluido com sucesso!`)
-       listaAtivos()
+      await api.delete(`ativos/${ativo.id}`)
+      alert(`Registro de ${ativo.descricao} excluido com sucesso!`)
+      listaAtivos(ativo.codlocalidade)
     }
   }
 
@@ -105,12 +86,9 @@ export default function Ativos() {
       alert("Selecione uma localidade (obrigatório)")
       return
     }
-
     const params = new URLSearchParams(
       Object.entries(filtros).filter(([_, v]) => v !== "")
     )
-
-    // const { data } = await api.get(`http://localhost:3333/ativos?${params}`)
     const { data } = await api.get(`ativos?${params}`)
     setAtivos(data)
   }
@@ -118,82 +96,76 @@ export default function Ativos() {
   return (
     <div>
       <div className="flex flex-row justify-between mb-2">
-        <div className="flex flex-row gap-8">
-          <h1 className="text-2xl font-bold mr-12">Ativos</h1>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 w-full">
+          <h1 className="text-2xl font-bold mr-12 md:text-left text-center">Ativos</h1>
+          <Select
+            onValueChange={(v) => setFiltros({ ...filtros, codlocalidade: v })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Localidade" />
+            </SelectTrigger>
+            <SelectContent>
+              {localidades.map((loc) => (
+                <SelectItem key={loc.id} value={String(loc.id)}>
+                  {loc.descricao}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-          <div className="space-y-6">
-            <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-              <Select
-                onValueChange={(v) => setFiltros({ ...filtros, codlocalidade: v })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Localidade" />
-                </SelectTrigger>
-                <SelectContent>
-                  {localidades.map((loc) => (
-                    <SelectItem key={loc.id} value={String(loc.id)}>
-                      {loc.descricao}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          <Select
+            onValueChange={(v) => setFiltros({ ...filtros, codcentrocusto: v })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Centro de Custo" />
+            </SelectTrigger>
+            <SelectContent>
+              {centroCusto.map((cc) => (
+                <SelectItem key={cc.id} value={String(cc.id)}>
+                  {cc.descricao}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-              <Select
-                onValueChange={(v) => setFiltros({ ...filtros, codcentrocusto: v })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Centro de Custo" />
-                </SelectTrigger>
-                <SelectContent>
-                  {centroCusto.map((cc) => (
-                    <SelectItem key={cc.id} value={String(cc.id)}>
-                      {cc.descricao}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          <Select
+            onValueChange={(v) => setFiltros({ ...filtros, codsubgrupo: v })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Subgrupo" />
+            </SelectTrigger>
+            <SelectContent>
+              {subgrupos.map((sg) => (
+                <SelectItem key={sg.id} value={String(sg.id)}>
+                  {sg.grupo} - {sg.descricao}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-              <Select
-                onValueChange={(v) => setFiltros({ ...filtros, codsubgrupo: v })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Subgrupo" />
-                </SelectTrigger>
-                <SelectContent>
-                  {subgrupos.map((sg) => (
-                    <SelectItem key={sg.id} value={String(sg.id)}>
-                      {sg.grupo} - {sg.descricao}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          <Select
+            onValueChange={(v) => setFiltros({ ...filtros, codmarca: v })}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Marca" />
+            </SelectTrigger>
+            <SelectContent>
+              {marcas.map((m) => (
+                <SelectItem key={m.id} value={String(m.id)}>
+                  {m.descricao}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-              <Select
-                onValueChange={(v) => setFiltros({ ...filtros, codmarca: v })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Marca" />
-                </SelectTrigger>
-                <SelectContent>
-                  {marcas.map((m) => (
-                    <SelectItem key={m.id} value={String(m.id)}>
-                      {m.descricao}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Input
-                placeholder="Código / texto"
-                value={filtros.codigo}
-                onChange={(e) => setFiltros({ ...filtros, codigo: e.target.value })}
-              />
-              <Button className="w-20" onClick={buscarAtivos}>Buscar</Button>
-            </div>
-          </div>
-
+          <Input
+            placeholder="Código (000000)"
+            value={filtros.codigo}
+            onChange={(e) => setFiltros({ ...filtros, codigo: e.target.value })}
+          />
+          <Button className="md:w-20 w-full" onClick={buscarAtivos}>Buscar</Button>
+          <Button className="w-full md:w-20" variant="outline" onClick={ () => handleOpenModal('add', {} as IAtivo) }>+ Novo</Button>
         </div>
-        <Button variant="outline" onClick={ () => handleOpenModal('add', {} as IAtivo) }>+ Novo</Button>
       </div>
       <div>
         <Table>
@@ -222,6 +194,7 @@ export default function Ativos() {
                     id: Number(item.id),
                     codigo: item.codigo,
                     status: item.status,
+                    motivo_baixa: item.motivo_baixa,
                     descricao: item.descricao,
                     aquisicao: item.aquisicao,
                     valor_aquisicao: item.valor_aquisicao,
@@ -247,28 +220,34 @@ export default function Ativos() {
           onAfterClose={listaAtivos}
           style={{
             overlay: {
-              position: 'fixed',
-              backgroundColor: 'rgba(255, 255, 255, 0.75)'
+              position: "fixed",
+              backgroundColor: "rgba(255, 255, 255, 0.75)",
+              zIndex: 50,
             },
             content: {
-              position: 'absolute',
-              top: '10%',
-              left: '20%',
-              right: '20%',
-              bottom: '20%',
-              border: '1px solid #ccc',
-              background: '#fff',
-              overflow: 'auto',
-              width: 'auto',
-              height: 'auto',
-              WebkitOverflowScrolling: 'touch',
-              borderRadius: '4px',
-              outline: 'none',
-              padding: '10px'
-            }  
+              position: window.innerWidth <= 768 ? "fixed" : "absolute",
+              top: window.innerWidth <= 768 ? "0" : "10%",
+              left: window.innerWidth <= 768 ? "0" : "30%",
+              right: window.innerWidth <= 768 ? "0" : "20%",
+              bottom: window.innerWidth <= 768 ? "0" : "20%",
+              border: "1px solid #ccc",
+              background: "#fff",
+              overflow: "auto",
+              width: window.innerWidth <= 768 ? "100%" : "810px",
+              height: "auto",
+              WebkitOverflowScrolling: "touch",
+              borderRadius: window.innerWidth <= 768 ? "0" : "4px",
+              outline: "none",
+              padding: "10px",
+            },
           }}
         >
-          <FrmAtivo isModalOpen={setIsOpenModal} isEditting={isEditting} ativo={ativo} />
+          <FrmAtivo 
+            isModalOpen={setIsOpenModal} 
+            isEditting={isEditting} 
+            ativo={ativo} 
+            listAtivos={() => listaAtivos(codLocal)} 
+          />
         </ReactModal>
       </div>
     </div>

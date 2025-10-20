@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom"
 import Home from "@/pages/home"
 import Ativos from "@/pages/ativos"
-import Sobre from "@/pages/sobre"
 import {
   Menubar,
   MenubarContent,
@@ -21,6 +20,8 @@ import Marcas from "./pages/marcas"
 import Usuarios from "./pages/usuarios"
 import CentroCusto from "./pages/centrocusto"
 import Header from "./components/header"
+import MovAtivos from "./pages/movativos"
+import ConfAtivos from "./pages/confereativos"
 
 export default function App() {
   return (
@@ -80,6 +81,22 @@ export default function App() {
               </MenubarContent>
             </MenubarMenu>
 
+            {/* <MenubarMenu>
+              <MenubarTrigger>Movimentações</MenubarTrigger>
+              <MenubarContent>
+                <MenubarItem asChild>
+                  <Link to="/movativos">
+                    Ativos
+                  </Link>
+                </MenubarItem>
+                <MenubarItem asChild>
+                  <Link to="/confativos">
+                    Conferência de Ativos
+                  </Link>
+                </MenubarItem>
+              </MenubarContent>
+            </MenubarMenu> */}
+
             <MenubarMenu>
               <MenubarTrigger>Relatórios</MenubarTrigger>
               <MenubarContent>
@@ -117,7 +134,8 @@ export default function App() {
             <Route path="/marcas" element={<Marcas />} />
             <Route path="/ativos" element={<Ativos />} />
             <Route path="/usuarios" element={<Usuarios />} />
-            <Route path="/sobre" element={<Sobre />} />
+            <Route path="/movativos" element={<MovAtivos />} />
+            <Route path="/confativos" element={<ConfAtivos />} />
           </Routes>
         </div>
         

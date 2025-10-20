@@ -28,16 +28,38 @@ export interface IAtivo {
   id: number;
   codigo: string;
   status: string;
+  motivo_baixa: string;
   descricao: string;
   aquisicao: string;
-  valor_aquisicao: string;
-  valor_atual: string;
-  depreciacao: string;
+  valor_aquisicao: number;
+  valor_atual: number;
+  depreciacao: number;
   codsubgrupo: number;
   codcentrocusto: number;
   codmarca: number;
   encontrado: boolean;
   codlocalidade: number;
+}
+
+export interface IAtivoJoin {
+  id: number
+  codigo: string
+  status: string
+  motivo_baixa: string;
+  descricao: string
+  aquisicao: string
+  valor_aquisicao: number
+  valor_atual: number
+  depreciacao: number
+  codsubgrupo: number
+  codcentrocusto: number
+  codmarca: number
+  codlocalidade: number
+  encontrado: boolean
+  localidade: string
+  subgrupo: string
+  centrocusto: string
+  marca: string
 }
 
 export interface IUsuario {
