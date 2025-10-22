@@ -35,50 +35,67 @@ export function Login() {
   }
 
   return (
-    <div className="flex flex-col gap-6 flex-1 h-screen justify-center items-center">
-      <div className='p-10 rounded-lg shadow-lg border-2 border-gray-200 flex flex-col justify-between'>
-        <div className="flex flex-col justify-center items-center gap-3 mb-8">
-          <div className="flex flex-row justify-center items-center gap-12">
-            <img src={logotipo} alt="Controle Patrimonial" width={70} />
-            <img src={logosistema} alt="Controle Patrimonial" width={80} />
-          </div>
-          <h3 className="font-bold text-cyan-800 text-xl">CONTROLE PATRIONIAL</h3>
-        </div>
+    <div className="flex min-h-screen w-full justify-center items-center bg-gray-50">
+      <div className="flex flex-col justify-between w-full h-full md:w-1/3 md:h-2/3 p-6 rounded-none md:rounded-lg shadow-none md:shadow-xl border-none md:border border-gray-200">
         
-        <form className="flex flex-col flex-1 gap-4 mb-10 items-center" onSubmit={handleSubmit(handleLogin)}>
-          <div className="flex flex-col gap-2">
-            <label htmlFor="email" className='font-semibold text-sm'>Email:</label>
-            <input 
+        <div className="flex flex-col justify-center items-center gap-3 mb-8">
+          <div className="flex flex-row justify-center items-center gap-8">
+            <img src={logotipo} alt="Controle Patrimonial" width={60} />
+            <img src={logosistema} alt="Controle Patrimonial" width={70} />
+          </div>
+          <h3 className="font-bold text-cyan-800 text-lg md:text-xl text-center">
+            CONTROLE PATRIMONIAL
+          </h3>
+        </div>
+
+        <form
+          className="flex flex-col flex-1 gap-4 mb-10 items-center"
+          onSubmit={handleSubmit(handleLogin)}
+        >
+          <div className="flex flex-col gap-2 w-full max-w-xs">
+            <label htmlFor="email" className="font-semibold text-sm">
+              Email:
+            </label>
+            <input
               {...register('email')}
-              className="h-10 border-[1px] border-gray-400 rounded p-2 w-80"
-              id="email" 
-              name="email" 
-              type="email" 
-              placeholder="Email" 
+              className="h-10 border border-gray-400 rounded p-2 w-full"
+              id="email"
+              name="email"
+              type="email"
+              placeholder="Email"
             />
           </div>
 
-          <div className="flex flex-col gap-2">
-            <label htmlFor="password" className='font-semibold text-sm'>Senha:</label>
-            <input 
+          <div className="flex flex-col gap-2 w-full max-w-xs">
+            <label htmlFor="password" className="font-semibold text-sm">
+              Senha:
+            </label>
+            <input
               {...register('password')}
-              className="h-10 border-[1px] border-gray-400 rounded p-2 w-80"
-              id="password" 
-              name="password" 
-              type="password" 
-              placeholder='*****'
+              className="h-10 border border-gray-400 rounded p-2 w-full"
+              id="password"
+              name="password"
+              type="password"
+              placeholder="*****"
             />
-            {erroSenha && <span className="text-red-400 italic">{erroSenha}</span>}
+            {erroSenha && (
+              <span className="text-red-400 italic">{erroSenha}</span>
+            )}
           </div>
 
-          <div className="flex justify-center items-center gap-2 mt-2">
-            <Link to='/signup' className="font-semibold hover:text-cyan-600">Não tenho cadastro</Link> | 
-            <Link to='/forgot' className="font-semibold hover:text-cyan-600">Esqueci a senha</Link> 
+          <div className="flex justify-center items-center gap-2 mt-2 text-sm">
+            <Link to="/signup" className="font-semibold hover:text-cyan-600">
+              Não tenho cadastro
+            </Link>{" "}
+            |{" "}
+            <Link to="/forgot" className="font-semibold hover:text-cyan-600">
+              Esqueci a senha
+            </Link>
           </div>
-          
-          <button 
+
+          <button
             type="submit"
-            className="flex flex-row justify-center items-center gap-4 mt-4 p-2 rounded text-white w-80 bg-cyan-600 hover:bg-cyan-500"
+            className="flex flex-row justify-center items-center gap-3 mt-6 p-3 rounded text-white w-full max-w-xs bg-cyan-600 hover:bg-cyan-500"
           >
             <FiLogIn size={20} />
             Entrar
