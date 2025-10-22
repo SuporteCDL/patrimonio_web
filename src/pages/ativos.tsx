@@ -211,23 +211,25 @@ function exportarPDF() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="flex-1 bg-gray-100 border-b-2 border-gray-300">Localidade</TableHead>
-              <TableHead className="flex-1 bg-gray-100 border-b-2 border-gray-300">Centro de Custo</TableHead>
-              <TableHead className="flex-1 bg-gray-100 border-b-2 border-gray-300">Sub-Grupo</TableHead>
-              <TableHead className="flex-1 bg-gray-100 border-b-2 border-gray-300">Codigo</TableHead>
+              <TableHead className="bg-gray-100 border-b-2 border-gray-300">Localidade</TableHead>
+              <TableHead className="bg-gray-100 border-b-2 border-gray-300">Centro de Custo</TableHead>
+              <TableHead className="bg-gray-100 border-b-2 border-gray-300">Sub-Grupo</TableHead>
+              <TableHead className="bg-gray-100 border-b-2 border-gray-300">Codigo</TableHead>
               <TableHead className="flex-1 bg-gray-100 border-b-2 border-gray-300">Descrição</TableHead>
-              <TableHead className="flex-1 bg-gray-100 border-b-2 border-gray-300">Marca</TableHead>
+              <TableHead className="bg-gray-100 border-b-2 border-gray-300">Encontrado</TableHead>
+              <TableHead className="bg-gray-100 border-b-2 border-gray-300">Marca</TableHead>
               <TableHead className="text-center w-32 bg-gray-100 border-b-2 border-gray-300" colSpan={2}>Opções</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {ativos.map((item) => (
-              <TableRow key={item.id}>
+              <TableRow key={item.id} className={item.encontrado ? 'bg-blue-50' : 'bg-red-50'}>
                 <TableCell className="w-28">{item.localidade}</TableCell>
                 <TableCell className="w-44">{item.centrocusto}</TableCell>
                 <TableCell className="w-48">{item.subgrupo}</TableCell>
                 <TableCell className="w-10">{item.codigo}</TableCell>
                 <TableCell className="flex-1">{item.descricao}</TableCell>
+                <TableCell className="w-10 text-center">{item.encontrado ? 'Sim' : 'Não'}</TableCell>
                 <TableCell className="w-10">{item.marca}</TableCell>
                 <TableCell className="w-14">
                   <Link to='#' onClick={() => handleOpenModal('edit', {
