@@ -32,7 +32,7 @@ export default function Menu() {
         <div className="w-full mb-1">
           <Menubar>
             <MenubarMenu>
-              <MenubarTrigger asChild>
+              <MenubarTrigger asChild className="text-2xl lg:text-lg">
                 <Link to="/home" className="px-3 py-2 hover:bg-accent hover:text-accent-foreground rounded-md">
                   Home
                 </Link>
@@ -40,39 +40,39 @@ export default function Menu() {
             </MenubarMenu>
 
             <MenubarMenu>
-              <MenubarTrigger>Cadastros</MenubarTrigger>
+              <MenubarTrigger className="text-2xl lg:text-lg">Cadastros</MenubarTrigger>
               <MenubarContent>
-                <MenubarItem asChild>
+                <MenubarItem asChild className="text-2xl lg:text-lg">
                   <Link to="/localidades">
                     Localidades <MenubarShortcut>⌘L</MenubarShortcut>
                   </Link>
                 </MenubarItem>
-                <MenubarItem asChild>
+                <MenubarItem asChild className="text-2xl lg:text-lg">
                   <Link to="/grupos">
                     Grupos <MenubarShortcut>⌘G</MenubarShortcut>
                   </Link>
                 </MenubarItem>
-                <MenubarItem asChild>
+                <MenubarItem asChild className="text-2xl lg:text-lg">
                   <Link to="/subgrupos">
                     Sub-Grupos <MenubarShortcut>⌘S</MenubarShortcut>
                   </Link>
                 </MenubarItem>
-                <MenubarItem asChild>
+                <MenubarItem asChild className="text-2xl lg:text-lg">
                   <Link to='/marcas'>
                     Marcas <MenubarShortcut>⌘M</MenubarShortcut>
                   </Link>
                 </MenubarItem>
-                <MenubarItem asChild>
+                <MenubarItem asChild className="text-2xl lg:text-lg">
                   <Link to='/centrocusto'>
                     Centro de Custo <MenubarShortcut>⌘C</MenubarShortcut>
                   </Link>
                 </MenubarItem>
-                <MenubarItem asChild>
+                <MenubarItem asChild className="text-2xl lg:text-lg">
                   <Link to='/ativos'>
                     Ativos <MenubarShortcut>⌘A</MenubarShortcut>
                   </Link>
                 </MenubarItem>
-                <MenubarItem asChild>
+                <MenubarItem asChild className="text-2xl lg:text-lg">
                   <Link to='/usuarios'>
                     Usuários <MenubarShortcut>⌘U</MenubarShortcut>
                   </Link>
@@ -82,28 +82,13 @@ export default function Menu() {
             </MenubarMenu>
 
             <MenubarMenu>
-              <MenubarTrigger>Relatórios</MenubarTrigger>
-              <MenubarContent>
-                <MenubarSub>
-                  <MenubarSubTrigger>Ativos</MenubarSubTrigger>
-                  <MenubarSubContent>
-                    <MenubarSeparator />
-                    <MenubarItem>Ativos por Centro de Custo</MenubarItem>
-                    <MenubarItem>Ativos por Sub-Grupo</MenubarItem>
-                    <MenubarItem>Ativos Conferidos</MenubarItem>
-                    <MenubarItem>Ativos a Conferir</MenubarItem>
-                  </MenubarSubContent>
-                </MenubarSub>
-                <MenubarSeparator />
-                <MenubarItem>Grupos</MenubarItem>
-                <MenubarItem>Sub-Grupos</MenubarItem>
-                <MenubarItem>Marcas</MenubarItem>
-                <MenubarItem>Movimentações</MenubarItem>
-              </MenubarContent>
+              <MenubarTrigger asChild className="text-2xl lg:text-lg">
+                <Link to='conferencia'>Conferência</Link>
+              </MenubarTrigger>
             </MenubarMenu>
 
             <MenubarMenu>
-              <MenubarTrigger asChild>
+              <MenubarTrigger asChild className="text-2xl lg:text-lg">
                 <Link to='/sair'>Sair</Link>
               </MenubarTrigger>
             </MenubarMenu>
@@ -122,12 +107,12 @@ export default function Menu() {
             <Route path="/ativos" element={<Ativos />} />
             <Route path="/usuarios" element={<Usuarios />} />
             <Route path="/movativos" element={<MovAtivos />} />
-            <Route path="/confativos" element={<ConfAtivos />} />
+            <Route path="/conferencia" element={<ConfAtivos />} />
             <Route path="/sair" element={<Logout />} />
           </Routes>
         </div>
         
-        <div className="text-sm text-center">:: 2025 ::</div>
+        <div className="text-lg text-center">:: 2025 ::</div>
       </div>
   )
 }

@@ -35,73 +35,68 @@ export function Login() {
   }
 
   return (
-    <div className="flex min-h-screen w-full justify-center items-center bg-gray-50">
-      <div className="flex flex-col justify-between w-full h-full md:w-1/3 md:h-2/3 p-6 rounded-none md:rounded-lg shadow-none md:shadow-xl border-none md:border border-gray-200">
-        
-        <div className="flex flex-col justify-center items-center gap-3 mb-8">
-          <div className="flex flex-row justify-center items-center gap-8">
-            <img src={logotipo} alt="Controle Patrimonial" width={60} />
-            <img src={logosistema} alt="Controle Patrimonial" width={70} />
-          </div>
-          <h3 className="font-bold text-cyan-800 text-lg md:text-xl text-center">
-            CONTROLE PATRIMONIAL
-          </h3>
+    <div className='flex flex-col p-16 mt-32 md:p-8 justify-center lg:w-1/3 mx-auto shadow-lg'>
+      <div className="flex flex-row justify-between items-center gap-4 mb-16">
+        <img src={logotipo} alt="Controle Patrimonial" className='w-32 h-28 lg:w-16 lg:h-12' />
+        <h3 className="font-bold text-cyan-800 text-5xl lg:text-lg text-center">
+          CONTROLE PATRIMONIAL
+        </h3>
+        <img src={logosistema} alt="Controle Patrimonial" className='w-32 h-28 lg:w-16 lg:h-14' />
+      </div>
+
+      <form
+        className="flex flex-col w-full gap-16 items-center lg:gap-4"
+        onSubmit={handleSubmit(handleLogin)}
+      >
+        <div className="flex flex-col gap-2 w-full">
+          <label htmlFor="email" className="font-semibold text-4xl lg:text-lg">
+            Email:
+          </label>
+          <input
+            {...register('email')}
+            className="h-28 w-full border border-gray-400 rounded p-2 text-4xl lg:h-10 lg:text-lg"
+            id="email"
+            name="email"
+            type="email"
+            placeholder="Email"
+          />
         </div>
 
-        <form
-          className="flex flex-col flex-1 gap-4 mb-10 items-center"
-          onSubmit={handleSubmit(handleLogin)}
+        <div className="flex flex-col gap-2 w-full">
+          <label htmlFor="password" className="font-semibold text-4xl lg:text-lg">
+            Senha:
+          </label>
+          <input
+            {...register('password')}
+            className="h-28 border border-gray-400 rounded p-2 w-full text-4xl lg:h-10 lg:text-lg"
+            id="password"
+            name="password"
+            type="password"
+            placeholder="*****"
+          />
+          {erroSenha && (
+            <span className="text-red-400 italic text-2xl">{erroSenha}</span>
+          )}
+        </div>
+
+        <div className="flex justify-center items-center gap-2 mt-2 text-sm">
+          <Link to="/signup" className="font-semibold hover:text-cyan-600 text-4xl lg:text-lg">
+            Não tenho cadastro
+          </Link>{" "}
+          |{" "}
+          <Link to="/forgot" className="font-semibold hover:text-cyan-600 text-4xl lg:text-lg">
+            Esqueci a senha
+          </Link>
+        </div>
+
+        <button
+          type="submit"
+          className="flex flex-row justify-center items-center gap-3 mt-6 p-3 rounded text-white w-full h-32 bg-cyan-600 hover:bg-cyan-500 text-5xl lg:w-52 lg:h-12 lg:text-lg"
         >
-          <div className="flex flex-col gap-2 w-full max-w-xs">
-            <label htmlFor="email" className="font-semibold text-sm">
-              Email:
-            </label>
-            <input
-              {...register('email')}
-              className="h-10 border border-gray-400 rounded p-2 w-full"
-              id="email"
-              name="email"
-              type="email"
-              placeholder="Email"
-            />
-          </div>
-
-          <div className="flex flex-col gap-2 w-full max-w-xs">
-            <label htmlFor="password" className="font-semibold text-sm">
-              Senha:
-            </label>
-            <input
-              {...register('password')}
-              className="h-10 border border-gray-400 rounded p-2 w-full"
-              id="password"
-              name="password"
-              type="password"
-              placeholder="*****"
-            />
-            {erroSenha && (
-              <span className="text-red-400 italic">{erroSenha}</span>
-            )}
-          </div>
-
-          <div className="flex justify-center items-center gap-2 mt-2 text-sm">
-            <Link to="/signup" className="font-semibold hover:text-cyan-600">
-              Não tenho cadastro
-            </Link>{" "}
-            |{" "}
-            <Link to="/forgot" className="font-semibold hover:text-cyan-600">
-              Esqueci a senha
-            </Link>
-          </div>
-
-          <button
-            type="submit"
-            className="flex flex-row justify-center items-center gap-3 mt-6 p-3 rounded text-white w-full max-w-xs bg-cyan-600 hover:bg-cyan-500"
-          >
-            <FiLogIn size={20} />
-            Entrar
-          </button>
-        </form>
-      </div>
+          <FiLogIn  />
+          Entrar
+        </button>
+      </form>
     </div>
   );
 }
